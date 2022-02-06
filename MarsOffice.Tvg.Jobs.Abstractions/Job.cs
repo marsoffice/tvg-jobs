@@ -16,14 +16,14 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public int? ContentMinChars { get; set; }
         public int? ContentMaxChars { get; set; }
         public bool? ContentIncludeLinks { get; set; }
-        public int? MinPosts { get; set; }
-        public int? MaxPosts { get; set; }
+        public int? ContentMinPosts { get; set; }
+        public int? ContentMaxPosts { get; set; }
         public float? SpeechPitch { get; set; }
         public float? SpeechSpeed { get; set; }
         public string SpeechLanguage { get; set; }
         public string SpeechType { get; set; }
-        public long? PauseBeforeInMillis { get; set; }
-        public long? PauseAfterInMillis { get; set; }
+        public long? SpeechPauseBeforeInMillis { get; set; }
+        public long? SpeechPauseAfterInMillis { get; set; }
         public int? AudioBackgroundQuality { get; set; }
         public float? AudioBackgroundVolumeInPercent { get; set; }
         public string VideoBackgroundResolution { get; set; }
