@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using MarsOffice.Microfunction;
@@ -60,6 +62,89 @@ namespace MarsOffice.Tvg.Jobs
                     }
                 }
                 return new OkObjectResult(result);
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, "Exception occured in function");
+                return new BadRequestObjectResult(Errors.Extract(e));
+            }
+        }
+
+        [FunctionName("GetJob")]
+        public async Task<IActionResult> GetJob(
+                    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "api/jobs/getJob/{id}")] HttpRequest req,
+                    [Table("Jobs", Connection = "localsaconnectionstring")] CloudTable jobsTable,
+                    ILogger log
+                    )
+        {
+            try
+            {
+                var principal = MarsOfficePrincipal.Parse(req);
+                var userId = principal.FindFirst("id").Value;
+                var id = req.RouteValues["id"].ToString();
+
+                var query = new TableQuery<JobEntity>()
+                    .Where(
+                        TableQuery.CombineFilters(
+                            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userId),
+                            TableOperators.And,
+                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id)
+                        )
+                    )
+                    .Take(1);
+
+                var queryResult = await jobsTable.ExecuteQuerySegmentedAsync(query, null);
+                if (!queryResult.Results.Any())
+                {
+                    return new OkObjectResult(null);
+                }
+                return new OkObjectResult(
+                    _mapper.Map<Job>(queryResult.Results.First())
+                );
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, "Exception occured in function");
+                return new BadRequestObjectResult(Errors.Extract(e));
+            }
+        }
+
+        [FunctionName("GetJobInternal")]
+        public async Task<IActionResult> GetJobInternal(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "api/jobs/getJobInternal/{userId}/{id}")] HttpRequest req,
+            [Table("Jobs", Connection = "localsaconnectionstring")] CloudTable jobsTable,
+            ILogger log,
+            ClaimsPrincipal principal
+            )
+        {
+            try
+            {
+                var env = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") ?? "Development";
+                if (env != "Development" && principal.FindFirstValue("roles") != "Application")
+                {
+                    return new StatusCodeResult(401);
+                }
+                var userId = req.RouteValues["userId"].ToString();
+                var id = req.RouteValues["id"].ToString();
+
+                var query = new TableQuery<JobEntity>()
+                    .Where(
+                        TableQuery.CombineFilters(
+                            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userId),
+                            TableOperators.And,
+                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id)
+                        )
+                    )
+                    .Take(1);
+
+                var queryResult = await jobsTable.ExecuteQuerySegmentedAsync(query, null);
+                if (!queryResult.Results.Any())
+                {
+                    return new OkObjectResult(null);
+                }
+                return new OkObjectResult(
+                    _mapper.Map<Job>(queryResult.Results.First())
+                );
             }
             catch (Exception e)
             {
