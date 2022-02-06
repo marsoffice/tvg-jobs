@@ -32,7 +32,7 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public string TextBoxColor { get; set; }
         public float? TextBoxOpacity { get; set; }
         public string TextBoxBorderColor { get; set; }
-        public string AutoUpload { get; set; }
+        public bool? DisabledAutoUpload { get; set; }
         public string PostDescription { get; set; }
         public string EditorVideoResolution { get; set; }
     }
