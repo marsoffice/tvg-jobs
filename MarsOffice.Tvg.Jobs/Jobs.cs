@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using FluentValidation;
 using MarsOffice.Microfunction;
 using MarsOffice.Tvg.Jobs.Abstractions;
 using MarsOffice.Tvg.Jobs.Entities;
@@ -22,10 +23,12 @@ namespace MarsOffice.Tvg.Jobs
     public class Jobs
     {
         private readonly IMapper _mapper;
+        private readonly IValidator<Job> _jobValidator;
 
-        public Jobs(IMapper mapper)
+        public Jobs(IMapper mapper, IValidator<Job> jobValidator)
         {
             _mapper = mapper;
+            _jobValidator = jobValidator;
         }
 
         [FunctionName("GetJobs")]
@@ -165,6 +168,7 @@ namespace MarsOffice.Tvg.Jobs
             {
                 var principal = MarsOfficePrincipal.Parse(req);
                 var userId = principal.FindFirst("id").Value;
+                var userEmail = principal.FindFirst("email").Value;
                 var json = string.Empty;
                 using (var streamReader = new StreamReader(req.Body))
                 {
@@ -176,6 +180,8 @@ namespace MarsOffice.Tvg.Jobs
                 });
                 payload.UserId = userId;
                 payload.Id = Guid.NewGuid().ToString();
+                payload.UserEmail = userEmail;
+                await _jobValidator.ValidateAndThrowAsync(payload);
 
                 var entity = _mapper.Map<JobEntity>(payload);
                 entity.PartitionKey = entity.UserId;
@@ -205,6 +211,7 @@ namespace MarsOffice.Tvg.Jobs
             {
                 var principal = MarsOfficePrincipal.Parse(req);
                 var userId = principal.FindFirst("id").Value;
+                var userEmail = principal.FindFirst("email").Value;
                 var id = req.RouteValues["id"].ToString();
 
                 var json = string.Empty;
@@ -218,6 +225,8 @@ namespace MarsOffice.Tvg.Jobs
                 });
                 payload.UserId = userId;
                 payload.Id = id;
+                payload.UserEmail = userEmail;
+                await _jobValidator.ValidateAndThrowAsync(payload);
 
                 var entity = _mapper.Map<JobEntity>(payload);
                 entity.PartitionKey = entity.UserId;

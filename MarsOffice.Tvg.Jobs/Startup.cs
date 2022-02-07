@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using FluentValidation;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,8 @@ namespace MarsOffice.Tvg.Jobs
             {
                 cfg.AllowNullCollections = true;
             }, typeof(Startup).Assembly);
+
+            builder.Services.AddValidatorsFromAssembly(typeof(Startup).Assembly);
         }
     }
 }
