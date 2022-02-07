@@ -46,7 +46,7 @@ namespace MarsOffice.Tvg.Jobs
                 try
                 {
                     var cronSchedule = CrontabSchedule.Parse(job.Cron);
-                    var nextOccurence = cronSchedule.GetNextOccurrence(normalizedNow.UtcDateTime);
+                    var nextOccurence = cronSchedule.GetNextOccurrence(normalizedNow.UtcDateTime.AddSeconds(-1));
                     if (nextOccurence == normalizedNow.UtcDateTime)
                     {
                         // await generateVideoQueue.AddAsync("test");
