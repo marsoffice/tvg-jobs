@@ -55,7 +55,9 @@ namespace MarsOffice.Tvg.Jobs
             {
                 try
                 {
-                    var cronSchedule = CrontabSchedule.Parse(job.Cron);
+                    var cronSchedule = CrontabSchedule.Parse(job.Cron, new CrontabSchedule.ParseOptions {
+                        IncludingSeconds = true
+                    });
                     var nextOccurence = cronSchedule.GetNextOccurrence(normalizedNow.UtcDateTime.AddSeconds(-1));
                     if (nextOccurence == normalizedNow.UtcDateTime)
                     {
