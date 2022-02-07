@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
+using MarsOffice.Tvg.Jobs.Abstractions;
 using MarsOffice.Tvg.Jobs.Entities;
+using MarsOffice.Tvg.Videos.Abstractions;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -12,10 +15,17 @@ namespace MarsOffice.Tvg.Jobs
 {
     public class JobStarter
     {
+        private readonly IMapper _mapper;
+
+        public JobStarter(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
         [FunctionName("JobStarter")]
         public async Task Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer,
         [Table("Jobs", Connection = "localsaconnectionstring")] CloudTable jobsTable,
-        [Queue("generate-video", Connection = "localsaconnectionstring")] IAsyncCollector<dynamic> generateVideoQueue,
+        [Queue("generate-video", Connection = "localsaconnectionstring")] IAsyncCollector<GenerateVideo> generateVideoQueue,
         ILogger log)
         {
             var now = DateTimeOffset.UtcNow;
@@ -49,7 +59,12 @@ namespace MarsOffice.Tvg.Jobs
                     var nextOccurence = cronSchedule.GetNextOccurrence(normalizedNow.UtcDateTime.AddSeconds(-1));
                     if (nextOccurence == normalizedNow.UtcDateTime)
                     {
-                        // await generateVideoQueue.AddAsync("test");
+                        await generateVideoQueue.AddAsync(
+                            new GenerateVideo {
+                                RequestDate = normalizedNow.UtcDateTime,
+                                Job = _mapper.Map<Job>(job)
+                            }
+                        );
                         added = true;
                     }
                 }
