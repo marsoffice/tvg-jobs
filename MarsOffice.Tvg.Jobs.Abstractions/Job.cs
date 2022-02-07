@@ -15,6 +15,8 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public DateTimeOffset? ContentStartDate { get; set; }
         public int? ContentMinChars { get; set; }
         public int? ContentMaxChars { get; set; }
+        public string ContentTranslateFromLanguage { get; set; }
+        public string ContentTranslateToLanguage { get; set; }
         public int? ContentNoOfIncludedTopComments { get; set; }
         public bool? ContentIncludeLinks { get; set; }
         public int? ContentMinPosts { get; set; }
