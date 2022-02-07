@@ -6,6 +6,7 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
     {
         public string Id { get; set; }
         public string UserId { get; set; }
+        public string UserEmail { get; set; }
         public string Name { get; set; }
         public int? PreferredDurationInSeconds { get; set; }
         public bool? Disabled { get; set; }
