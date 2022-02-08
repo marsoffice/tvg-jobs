@@ -61,7 +61,7 @@
       "options": {
         "cwd": "${workspaceFolder}/MarsOffice.Tvg.Jobs/bin/Debug/net6.0"
       },
-      "command": "host start --port 7001",
+      "command": "host start --port 7004",
       "isBackground": true,
       "problemMatcher": "$func-dotnet-watch"
     }

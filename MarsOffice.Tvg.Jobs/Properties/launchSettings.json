@@ -2,7 +2,7 @@
   "profiles": {
     "MarsOffice.Tvg.Jobs": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7001"
+      "commandLineArgs": "--port 7004"
     }
   }
 }
