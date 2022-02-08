@@ -13,6 +13,7 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public string Cron { get; set; }
         public string ContentType { get; set; }
         public string ContentTopic { get; set; }
+        public bool? ContentGetLatestPosts { get; set; }
         public DateTimeOffset? ContentStartDate { get; set; }
         public int? ContentMinChars { get; set; }
         public int? ContentMaxChars { get; set; }
