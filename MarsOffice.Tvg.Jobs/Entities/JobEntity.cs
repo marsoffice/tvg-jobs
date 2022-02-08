@@ -41,6 +41,6 @@ namespace MarsOffice.Tvg.Jobs.Entities
         public bool? DisabledAutoUpload { get; set; }
         public string PostDescription { get; set; }
         public string EditorVideoResolution { get; set; }
-
+        public string AutoUploadTikTokAccounts { get; set; }
     }
 }
