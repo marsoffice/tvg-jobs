@@ -9,6 +9,7 @@ using FluentValidation;
 using MarsOffice.Microfunction;
 using MarsOffice.Tvg.Jobs.Abstractions;
 using MarsOffice.Tvg.Jobs.Entities;
+using MarsOffice.Tvg.Videos.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
@@ -275,6 +276,61 @@ namespace MarsOffice.Tvg.Jobs
                 }
 
                 return new OkResult();
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, "Exception occured in function");
+                return new BadRequestObjectResult(Errors.Extract(e));
+            }
+        }
+
+        [FunctionName("StartJob")]
+        public async Task<IActionResult> StartJob(
+                    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "api/jobs/startJob/{id}")] HttpRequest req,
+                    [Table("Jobs", Connection = "localsaconnectionstring")] CloudTable jobsTable,
+                     [Queue("generate-video", Connection = "localsaconnectionstring")] IAsyncCollector<GenerateVideo> generateVideoQueue,
+                    ILogger log
+                    )
+        {
+            try
+            {
+                var principal = MarsOfficePrincipal.Parse(req);
+                var userId = principal.FindFirst("id").Value;
+                var id = req.RouteValues["id"].ToString();
+
+                var query = new TableQuery<JobEntity>()
+                    .Where(
+                        TableQuery.CombineFilters(
+                            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userId),
+                            TableOperators.And,
+                            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id)
+                        )
+                    )
+                    .Take(1);
+
+                var queryResult = await jobsTable.ExecuteQuerySegmentedAsync(query, null);
+                if (!queryResult.Results.Any())
+                {
+                    return new BadRequestObjectResult(new Dictionary<string, List<ErrorDto>> {
+                        {"", new List<ErrorDto> {
+                            new ErrorDto {
+                                Message = "Job not found"
+                            }
+                        }}
+                    });
+                }
+
+                var dto = _mapper.Map<Job>(queryResult.Results.First());
+                await generateVideoQueue.AddAsync(new GenerateVideo
+                {
+                    Job = dto,
+                    RequestDate = DateTimeOffset.UtcNow
+                });
+                await generateVideoQueue.FlushAsync();
+
+                return new OkObjectResult(
+                    new JobStarted()
+                );
             }
             catch (Exception e)
             {
