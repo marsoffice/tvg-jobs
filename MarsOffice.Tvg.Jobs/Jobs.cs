@@ -328,9 +328,7 @@ namespace MarsOffice.Tvg.Jobs
                 });
                 await generateVideoQueue.FlushAsync();
 
-                return new OkObjectResult(
-                    new JobStarted()
-                );
+                return new OkResult();
             }
             catch (Exception e)
             {
