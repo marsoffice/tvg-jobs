@@ -26,6 +26,7 @@ namespace MarsOffice.Tvg.Jobs.Entities
         public int? ContentMinPosts { get; set; }
         public int? ContentMaxPosts { get; set; }
         public float? SpeechPitch { get; set; }
+        public string SpeechLanguage {get;set;}
         public float? SpeechSpeed { get; set; }
         public string SpeechType { get; set; }
         public long? SpeechPauseBeforeInMillis { get; set; }
