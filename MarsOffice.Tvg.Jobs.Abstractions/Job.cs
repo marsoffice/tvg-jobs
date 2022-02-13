@@ -35,6 +35,7 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public string TextFontFamily { get; set; }
         public float? TextFontSize { get; set; }
         public string TextBoxColor { get; set; }
+        public string TextColor { get; set; }
         public float? TextBoxOpacity { get; set; }
         public string TextBoxBorderColor { get; set; }
         public bool? DisabledAutoUpload { get; set; }
