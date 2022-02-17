@@ -8,7 +8,8 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public string UserId { get; set; }
         public string UserEmail { get; set; }
         public string Name { get; set; }
-        public int? PreferredDurationInSeconds { get; set; }
+        public long? FinalFileDurationInMillis { get; set; }
+        public bool? TrimGracefullyToMaxDuration { get; set; }
         public bool? Disabled { get; set; }
         public string Cron { get; set; }
         public string ContentType { get; set; }
