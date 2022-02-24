@@ -250,6 +250,7 @@ namespace MarsOffice.Tvg.Jobs
         public async Task<IActionResult> DeleteJob(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "api/jobs/deleteJob/{id}")] HttpRequest req,
             [Table("Jobs", Connection = "localsaconnectionstring")] CloudTable jobsTable,
+            [Queue("job-deleted", Connection = "localsaconnectionstring")] IAsyncCollector<JobDeleted> jobDeletedQueue,
             ILogger log
             )
         {
@@ -257,6 +258,7 @@ namespace MarsOffice.Tvg.Jobs
             {
                 var principal = MarsOfficePrincipal.Parse(req);
                 var userId = principal.FindFirst("id").Value;
+                var userEmail = principal.FindFirst("email").Value;
                 var id = req.RouteValues["id"].ToString();
 
                 var operation = TableOperation.Delete(new JobEntity
@@ -274,7 +276,12 @@ namespace MarsOffice.Tvg.Jobs
                 {
                     // ignored
                 }
-
+                await jobDeletedQueue.AddAsync(new JobDeleted {
+                    JobId = id,
+                    UserEmail = userEmail,
+                    UserId = userId
+                });
+                await jobDeletedQueue.FlushAsync();
                 return new OkResult();
             }
             catch (Exception e)
