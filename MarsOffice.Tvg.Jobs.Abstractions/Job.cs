@@ -14,6 +14,7 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public string Cron { get; set; }
         public string ContentType { get; set; }
         public string ContentTopic { get; set; }
+        public string SelectedContent { get; set; }
         public bool? ContentGetLatestPosts { get; set; }
         public DateTimeOffset? ContentStartDate { get; set; }
         public int? ContentMinChars { get; set; }
@@ -31,8 +32,10 @@ namespace MarsOffice.Tvg.Jobs.Abstractions
         public long? SpeechPauseBeforeInMillis { get; set; }
         public long? SpeechPauseAfterInMillis { get; set; }
         public int? AudioBackgroundQuality { get; set; }
+        public string SelectedAudioBackground { get; set; }
         public float? AudioBackgroundVolumeInPercent { get; set; }
         public string VideoBackgroundResolution { get; set; }
+        public string SelectedVideoBackground { get; set; }
         public string TextFontFamily { get; set; }
         public float? TextFontSize { get; set; }
         public string TextBoxColor { get; set; }
