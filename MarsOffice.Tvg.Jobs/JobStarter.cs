@@ -33,7 +33,11 @@ namespace MarsOffice.Tvg.Jobs
 
             var allJobsQuery = new TableQuery<JobEntity>()
                 .Where(
-                    TableQuery.GenerateFilterCondition("Disabled", QueryComparisons.NotEqual, "true")
+                    TableQuery.CombineFilters(
+                        TableQuery.GenerateFilterCondition("Disabled", QueryComparisons.NotEqual, "true"),
+                        TableOperators.And,
+                        TableQuery.GenerateFilterCondition("Cron", QueryComparisons.NotEqual, null)
+                    )
                 );
 
             TableContinuationToken tct = null;
