@@ -47,7 +47,8 @@ namespace MarsOffice.Tvg.Jobs
                 var query = new TableQuery<JobEntity>()
                     .Where(
                         TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userId)
-                    );
+                    )
+                    .OrderByDesc("Timestamp");
 
                 var result = new List<Job>();
 

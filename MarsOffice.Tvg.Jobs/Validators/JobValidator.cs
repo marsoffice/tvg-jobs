@@ -8,7 +8,6 @@ namespace MarsOffice.Tvg.Jobs.Validators
         public JobValidator()
         {
             RuleFor(x => x.Name).NotEmpty();
-            RuleFor(x => x.Cron).NotEmpty();
         }
     }
 }
