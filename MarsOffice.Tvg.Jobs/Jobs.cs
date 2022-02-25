@@ -48,25 +48,34 @@ namespace MarsOffice.Tvg.Jobs
                     .Where(
                         TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userId)
                     )
-                    .OrderByDesc("Timestamp");
+                    .OrderByDesc("Timestamp")
+                    .Take(int.Parse(req.Query["pageSize"]));
+
 
                 var result = new List<Job>();
 
                 TableContinuationToken tct = null;
-                var hasData = true;
-                while (hasData)
+
+                if (req.Query.ContainsKey("nextRowKey"))
                 {
-                    var queryResult = await jobsTable.ExecuteQuerySegmentedAsync(query, tct);
-                    result.AddRange(
-                        _mapper.Map<IEnumerable<Job>>(queryResult)
-                    );
-                    tct = queryResult.ContinuationToken;
-                    if (tct == null)
+                    tct = new TableContinuationToken
                     {
-                        hasData = false;
-                    }
+                        NextPartitionKey = userId,
+                        NextRowKey = req.Query["nextRowKey"]
+                    };
                 }
-                return new OkObjectResult(result);
+
+                var queryResult = await jobsTable.ExecuteQuerySegmentedAsync(query, tct);
+                result.AddRange(
+                    _mapper.Map<IEnumerable<Job>>(queryResult)
+                );
+                tct = queryResult.ContinuationToken;
+
+                return new OkObjectResult(new JobsList
+                {
+                    Items = result,
+                    NextRowKey = tct?.NextRowKey
+                });
             }
             catch (Exception e)
             {
@@ -277,7 +286,8 @@ namespace MarsOffice.Tvg.Jobs
                 {
                     // ignored
                 }
-                await jobDeletedQueue.AddAsync(new JobDeleted {
+                await jobDeletedQueue.AddAsync(new JobDeleted
+                {
                     JobId = id,
                     UserEmail = userEmail,
                     UserId = userId
