@@ -36,7 +36,7 @@ namespace MarsOffice.Tvg.Jobs
                     TableQuery.CombineFilters(
                         TableQuery.GenerateFilterCondition("Disabled", QueryComparisons.NotEqual, "true"),
                         TableOperators.And,
-                        TableQuery.GenerateFilterCondition("Cron", QueryComparisons.LessThanOrEqual, "")
+                        TableQuery.GenerateFilterCondition("Cron", QueryComparisons.GreaterThan, "")
                     )
                 );
 
